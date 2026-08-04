@@ -1,7 +1,12 @@
 {
-  "easyC": "qwiic",
-  "easyC Arduino Library": "qwiic Arduino Library",
-  "Dasduino": "NULA",
+  "qwiic/Qwiic": "qwiic",
+  "easyC/Qwiic": "qwiic",
   "Dasduino NULA": "NULA",
-  "Inkplate 6 Color": "Inkplate 6COLOR"
+  "Inkplate 6 Color": "Inkplate 6COLOR",
+  "micro-python": "MicroPython",
+  "Micropython": "MicroPython",
+  "easyC": "qwiic",
+  "Dasduino": "NULA",
+  "WiFi": "Wi-Fi",
+  "wifi": "Wi-Fi"
 }

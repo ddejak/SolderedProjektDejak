@@ -5,8 +5,22 @@
   "ic": "IC",
   "gpio": "GPIO",
   "adc": "ADC",
+  "dac": "DAC",
   "i2c": "I2C",
   "spi": "SPI",
+  "uart": "UART",
   "pwm": "PWM",
-  "usb": "USB"
+  "usb": "USB",
+  "sram": "SRAM",
+  "psram": "PSRAM",
+  "eeprom": "EEPROM",
+  "led": "LED",
+  "ble": "BLE",
+  "wifi": "Wi-Fi",
+  "qwiic": "qwiic",
+  "rgb": "RGB",
+  "pcb": "PCB",
+  "id": "ID",
+  "os": "OS",
+  "url": "URL"
 }

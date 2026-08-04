@@ -1,8 +1,20 @@
 {
   "wifi4": "Wi-Fi 4",
+  "wifi5": "Wi-Fi 5",
+  "wifi6": "Wi-Fi 6",
   "classic_and_ble": "Classic + BLE",
+  "ble_only": "BLE only",
   "jst_2pin": "JST 2-pin",
   "usb_c": "USB-C",
+  "micro_usb": "Micro USB",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "none": "None",
+  "3v3": "3.3 V",
+  "5v": "5 V",
+  "3v3_5v": "3.3–5 V",
+  "3v3_or_5v": "3.3 V or 5 V",
+  "grayscale": "Grayscale",
+  "ESP32 WROVER-E": "ESP32-WROVER-E",
+  "ESP32-S3-WROOM-1(N8R8)": "ESP32-S3-WROOM-1 (N8R8)"
 }

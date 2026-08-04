@@ -247,7 +247,18 @@ then capped by group and field count, dropping from the bottom of the ranking, b
 the page budget is fixed.
 
 The full datasheet prints every group in source order and adds overview, technical
-details, variants and the full resource list.
+details, the pinout diagram, variants and the full resource list.
+
+### The pinout is embedded, not linked
+
+R2 lists the pinout as full-datasheet content, and Soldered publishes it as a plain PNG
+rather than as a page. A link is no use to someone holding a printout, so the full sheet
+embeds the image and then drops it from the Resources list, where it would just be a
+duplicate. Its height is capped so the diagram never splits across a page break — half a
+pinout is worse than none.
+
+Inkplate 6 has no pinout resource, so the section does not exist on its sheet. That is the
+R3 rule doing its job on a section that is not a spec table.
 
 ---
 
@@ -305,6 +316,17 @@ requires `3.3 V`.
 **One spec group has an empty key** (`""`, labelled "Other") on all three products, so any
 code that keys groups by identifier has to handle the empty string.
 
+**`Qwiic` is capitalised in prose** where the brief asks for lowercase `qwiic`. The tool
+lowercases it, but with a guard: `SparkFun Qwiic` and `Adafruit Qwiic` keep their capital,
+because that is someone else's trademark rather than our connector. `Connectors: Qwiicx2`
+is left alone deliberately — it is a malformed value (`Qwiic x2` run together) and
+rewriting it would mangle it further, so it is better surfaced than silently patched.
+
+**The retired name is baked into the pinout image.** The SHTC3 pinout diagram has "via
+easyC/Qwiic" rendered into the PNG itself. Nothing a text pipeline can fix, and it will
+keep reaching customers until the image is regenerated. Probably the single most visible
+place the old naming still shows up.
+
 ---
 
 ## What I tested
@@ -335,6 +357,9 @@ Edge cases run by hand against the routes, with the actual result:
 | Variant SKU `333229` (Inkplate with enclosure) | Valid one-pager, 1 page |
 | German one-pager, Croatian full sheet | Both valid, translated labels and resources |
 | WeasyPrint missing (Windows, no GTK) | App still starts; `/generate` explains why and links to the HTML preview |
+| Product with no pinout (`333232`) | Pinout section skipped entirely, no empty heading (R3) |
+| `SparkFun Qwiic` / `Adafruit Qwiic` in prose | Left capitalised; only unqualified `Qwiic` is lowercased |
+| `easyC` inside a GitHub URL | `href` untouched, link text renamed — the repo really is called `...-easyC-Arduino-Library` |
 | Second fetch of the same SKU | Cold 0.455 s / 1 request, warm 0.004 s / 0 requests (measured with `requests.get` counted) |
 
 Things I checked by eye on the rendered PDFs: tables not cut across page breaks, no
@@ -399,10 +424,9 @@ artefact, read the actual output, compare against the source page — and it is 
 - **Cold starts.** The free tier sleeps after ~15 minutes, so the first visit in a while
   takes 30–50 seconds. Everything after that is fast. A paid instance or a keep-alive
   cron would fix it; neither felt right for a task submission.
-- **Pinout images.** The NULA and SHTC3 pages expose a pinout PNG under technical
-  resources. It is linked but not embedded; on a datasheet it deserves a page. This is
-  the thing I would do first with more time — R2 explicitly lists pinout as full-datasheet
-  content, and I am linking it rather than showing it.
+- **Schematics.** Hardware Details links to a page with schematics behind it. Embedding
+  those would mean following the link and parsing another page, which is a bigger job
+  than the pinout was, and I stopped at the product page.
 - **Layout options (B2).** Not attempted. B1 (language) came almost free with the data, B2
   did not, and the core mattered more.
 - **Typical applications exists only for the three graded SKUs, and only in English.** Any

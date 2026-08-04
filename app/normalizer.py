@@ -77,15 +77,27 @@ class Normalizer:
         return json.loads(path.read_text(encoding="utf-8"))
 
     def _compile_naming_patterns(self) -> list[tuple[re.Pattern, str]]:
+        """Compile naming_map into ordered substitutions.
+
+        Keys are plain text, matched whole-word and case-insensitively. A key
+        prefixed with `re:` is used as a raw, case-sensitive pattern instead,
+        which is what the qwiic rule needs: the brief wants Soldered's connector
+        lowercase, but "SparkFun Qwiic" is someone else's trademark and has to
+        keep its capital.
+        """
         patterns = []
         # Longest first, so "Dasduino NULA" wins over "Dasduino".
         for source in sorted(self.naming_map, key=len, reverse=True):
-            pattern = re.compile(r"\b" + re.escape(source) + r"\b", flags=re.IGNORECASE)
+            if source.startswith("re:"):
+                pattern = re.compile(source[3:])
+            else:
+                pattern = re.compile(r"\b" + re.escape(source) + r"\b", flags=re.IGNORECASE)
             patterns.append((pattern, self.naming_map[source]))
         return patterns
 
     def normalize(self, raw: dict) -> dict:
         sku = raw.get("sku")
+        pinout, resources = self._split_pinout(raw.get("resources", []))
         return {
             "sku": sku,
             "locales": {
@@ -95,7 +107,8 @@ class Normalizer:
             "variants": raw.get("variants", []),
             "images": raw.get("images", []),
             "box_contents": self._normalize_box(raw.get("box_contents", [])),
-            "resources": raw.get("resources", []),
+            "resources": resources,
+            "pinout": pinout,
             "last_updated": raw.get("last_updated"),
             "typical_applications": self.typical_applications,
         }
@@ -244,6 +257,33 @@ class Normalizer:
         return f"{value} {unit}"
 
     # ------------------------------------------------------------------ other
+
+    def _split_pinout(self, resources: list) -> tuple[dict | None, list]:
+        """Pull the pinout diagram out of the resource links so it can be shown.
+
+        R2 lists the pinout as full-datasheet content, and it is published as a
+        plain image rather than as a page, so the full sheet embeds it instead
+        of printing a link the reader cannot follow on paper. It is then dropped
+        from the Resources list, where it would be a duplicate.
+
+        Not every product has one — Inkplate 6 does not — so the caller has to
+        cope with None, and the section is skipped entirely (R3).
+        """
+        pinout = None
+        remaining = []
+        for category in resources:
+            items = []
+            for item in category.get("items", []):
+                href = (item.get("href") or "").lower()
+                is_image = href.endswith((".png", ".jpg", ".jpeg", ".webp", ".gif"))
+                is_pinout = "pinout" in (item["labels"].get("en") or "").lower()
+                if pinout is None and is_image and is_pinout:
+                    pinout = item
+                    continue
+                items.append(item)
+            if items:
+                remaining.append({**category, "items": items})
+        return pinout, remaining
 
     def _normalize_box(self, items: list[dict]) -> list[dict]:
         normalized = []

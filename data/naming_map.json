@@ -1,4 +1,5 @@
 {
+  "re:(?<!SparkFun )(?<!Adafruit )\\bQwiic\\b": "qwiic",
   "qwiic/Qwiic": "qwiic",
   "easyC/Qwiic": "qwiic",
   "Dasduino NULA": "NULA",

@@ -48,6 +48,17 @@
     </section>
     {% endif %}
 
+    {# Published as a bare image, so it is embedded rather than linked — a URL is
+       no use to someone holding a printout. Skipped when the product has none. #}
+    {% if product.pinout %}
+    <section class="section">
+      <h2>{{ product.pinout.labels.get(lang) or product.pinout.labels.get('en') }}</h2>
+      <figure class="pinout-figure">
+        <img src="{{ product.pinout.href }}" alt="{{ product.locales[lang].name }} pinout">
+      </figure>
+    </section>
+    {% endif %}
+
     {% if product.typical_applications.get(product.sku) %}
     <section class="section">
       <h2>{{ t.typical_applications }}</h2>

@@ -12,15 +12,16 @@
 
 :root {
   color-scheme: light;
-  --purple: #5b2379;
-  --purple-dark: #47205f;
-  --purple-tint: #f4eef8;
-  --blue: #23b9d6;
-  --ink: #1c1a1f;
-  --muted: #5f5a66;
-  --paper: #ffffff;
-  --line: #e2dee7;
-  --bg: #f7f5f9;
+  --purple:#5b2379;
+    --purple-dark:#3f1855;
+    --purple-tint:#f4eef8;
+    --blue:#23b9d6;
+    --blue-tint:#e8f8fc;
+    --ink:#1c1a1f;
+    --muted:#5f5a66;
+    --line:#e2dee7;
+    --paper:#ffffff;
+    --bg:#f7f5f9;
 }
 
 * { box-sizing: border-box; }
@@ -205,6 +206,9 @@ footer.report-footer p { margin: 0; }
   letter-spacing: 0.04em;
 }
 
+.pinout-figure { margin: 0; text-align: center; }
+.pinout-figure img { max-width: 100%; height: auto; }
+
 .variant-list { margin: 0; padding-left: 16px; }
 .footer-note { margin-top: 10px; color: var(--muted); font-size: 0.8rem; }
 
@@ -234,6 +238,12 @@ footer.report-footer p { margin: 0; }
   .spec-group, .resource-table, .box-list { page-break-inside: avoid; }
   .report-header { page-break-after: avoid; }
   img { max-width: 100%; }
+
+  /* Pinout diagrams are wide and tall enough to overflow a page on their own.
+   * Capping the height keeps the whole diagram on one page and stops it being
+   * split across a break, where half a pinout is worse than none. */
+  .pinout-figure { page-break-inside: avoid; }
+  .pinout-figure img { max-height: 150mm; max-width: 100%; width: auto; height: auto; }
 }
 
 /* The one-pager has a single A4 page to work with (R4), so it runs tighter than

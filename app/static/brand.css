@@ -161,6 +161,20 @@ html, body {
 @page {
   size: A4;
   margin: 18mm;
+  @bottom-left {
+    content: element(report-footer);
+    font-size: 9pt;
+    color: var(--muted);
+  }
+  @bottom-right {
+    content: "Page " counter(page) " of " counter(pages);
+    font-size: 9pt;
+    color: var(--muted);
+  }
+}
+
+footer.report-footer {
+  position: running(report-footer);
 }
 
 .sheet {

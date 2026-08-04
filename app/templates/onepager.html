@@ -40,10 +40,12 @@
     </section>
     {% endif %}
 
+    {% if product.typical_applications.get(product.sku) %}
     <section class="section">
       <h2>Typical applications</h2>
-      <p>{{ product.sku | upper }} is ideal for {{ product.sku }}.</p>
+      <p>{{ product.typical_applications[product.sku] }}</p>
     </section>
+    {% endif %}
 
     {% if product.box_contents %}
     <section class="section">

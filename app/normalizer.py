@@ -12,6 +12,7 @@ class Normalizer:
         self.abbrev_map = self._load_json("abbrev_fix.json")
         self.value_map = self._load_json("value_fix.json")
         self.naming_map = self._load_json("naming_map.json")
+        self.typical_applications = self._load_json("typical_applications.json")
         self.naming_patterns = self._compile_naming_patterns()
 
     def _load_json(self, file_name: str) -> dict:
@@ -36,6 +37,7 @@ class Normalizer:
             "box_contents": raw.get("box_contents", []),
             "resources": raw.get("resources", {}),
             "last_updated": raw.get("last_updated"),
+            "typical_applications": self.typical_applications,
         }
 
     def _normalize_locale(self, locale_data: dict) -> dict:

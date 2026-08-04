@@ -1,0 +1,1 @@
+This folder contains static assets used by the Flask app and PDF templates, including `brand.css`.

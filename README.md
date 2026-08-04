@@ -11,11 +11,20 @@ Pending deployment. This repo is prepared for Docker-based hosting on Render.com
    ```bash
    pip install flask requests beautifulsoup4 weasyprint
    ```
-3. Start the app:
+3. On Windows, WeasyPrint requires native GTK/Pango libraries. If you get a missing `libgobject-2.0-0` error, run the app in Docker or WSL.
+4. Start the app:
    ```bash
    python -m app.main
    ```
-4. Open `http://127.0.0.1:5000`
+5. Open `http://127.0.0.1:5000`
+
+## Docker
+Build and run the container to get WeasyPrint working without extra Windows setup:
+```bash
+docker build -t soldered-datasheet .
+docker run --rm -p 5000:5000 soldered-datasheet
+```
+Open `http://127.0.0.1:5000`.
 
 ## What it does
 - Loads `https://solde.red/search_index.json` and caches it locally.

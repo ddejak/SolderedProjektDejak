@@ -9,12 +9,16 @@
 <body>
   <main class="page-shell">
     <header class="app-header">
-      <div>
-        <p class="eyebrow">Soldered Electronics</p>
-        <h1>Product datasheet generator</h1>
-        <p class="hero-copy">Choose a product, select a template, then download a printable A4 PDF datasheet.</p>
-      </div>
+      <p class="eyebrow">Soldered Electronics</p>
+      <h1>Product datasheet generator</h1>
+      <p class="hero-copy">Pick a product, choose a template and language, then download a print-ready A4 PDF.</p>
     </header>
+
+    {% if not weasyprint_available %}
+    <section class="panel">
+      <p class="alert">PDF rendering is unavailable in this environment. You can still open the HTML preview.</p>
+    </section>
+    {% endif %}
 
     <section class="panel">
       <form method="get" class="search-form">
@@ -33,57 +37,67 @@
       {% endif %}
       {% if products %}
         <ul class="product-list">
-          {% for item in products[:40] %}
+          {% for item in products %}
             <li>
-              <a href="?sku={{ item.sku }}&template={{ selected_template }}&lang={{ selected_lang }}">{{ item.sku }} — {{ item.name }}</a>
+              <a href="?q={{ query }}&sku={{ item.sku }}&template={{ selected_template }}&lang={{ selected_lang }}">{{ item.sku }} — {{ item.name }}</a>
             </li>
           {% endfor %}
         </ul>
-        {% if products|length > 40 %}
-          <p class="note">Showing first 40 results. Narrow your search to refine.</p>
+        {% if result_count > max_results %}
+          <p class="note">Showing {{ max_results }} of {{ result_count }} matches. Narrow the search to see the rest.</p>
         {% endif %}
       {% else %}
-        <p>No products found.</p>
+        <p class="note">No products match that search.</p>
       {% endif %}
     </section>
 
     {% if product %}
     <section class="panel product-preview">
-      <h2>Selected product</h2>
+      <h2>{{ product.locales[selected_lang].name }}</h2>
       <div class="preview-grid">
         <div>
           <p class="meta-label">SKU</p>
           <p class="meta-value">{{ product.sku }}</p>
-          <p class="meta-label">Name</p>
-          <p class="meta-value">{{ product.locales[selected_lang].name }}</p>
-          <p class="meta-label">Template</p>
-          <p class="meta-value">{{ selected_template|capitalize }}</p>
         </div>
         <div>
-          <p class="meta-label">Language</p>
-          <p class="meta-value">{{ selected_lang }}</p>
-          <p class="meta-label">Specs on one-pager</p>
-          <p class="meta-value">{{ onepager_groups|join(', ') or 'auto' }}</p>
+          <p class="meta-label">Specification groups</p>
+          <p class="meta-value">{{ product.locales[selected_lang].spec_groups | length }}</p>
+        </div>
+        <div>
+          <p class="meta-label">On the one-pager</p>
+          <p class="meta-value">{{ onepager_groups | map(attribute='label') | join(', ') or '—' }}</p>
         </div>
       </div>
 
       <form method="get" class="generate-form">
         <input type="hidden" name="sku" value="{{ product.sku }}">
-        <label for="template">Choose template</label>
-        <select id="template" name="template">
-          {% for option in template_choices %}
-            <option value="{{ option }}" {% if option == selected_template %}selected{% endif %}>{{ option|capitalize }}</option>
-          {% endfor %}
-        </select>
-
-        <label for="lang">Language</label>
-        <select id="lang" name="lang">
-          {% for option in language_choices %}
-            <option value="{{ option }}" {% if option == selected_lang %}selected{% endif %}>{{ option.upper() }}</option>
-          {% endfor %}
-        </select>
-
-        <button type="submit" formaction="{{ url_for('generate_pdf') }}">Download PDF</button>
+        <input type="hidden" name="q" value="{{ query }}">
+        <div class="form-row">
+          <div>
+            <label for="template">Template</label>
+            <select id="template" name="template">
+              {% for option in template_choices %}
+                <option value="{{ option }}" {% if option == selected_template %}selected{% endif %}>
+                  {{ 'One-pager (1 page)' if option == 'onepager' else 'Full datasheet' }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="lang">Language</label>
+            <select id="lang" name="lang">
+              {% for option in language_choices %}
+                <option value="{{ option }}" {% if option == selected_lang %}selected{% endif %}>{{ option.upper() }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <button type="submit" formaction="{{ url_for('generate_pdf') }}">Download PDF</button>
+          </div>
+          <div>
+            <button type="submit" class="secondary" formaction="{{ url_for('preview') }}" formtarget="_blank">Preview in browser</button>
+          </div>
+        </div>
       </form>
     </section>
     {% endif %}

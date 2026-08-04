@@ -1,25 +1,28 @@
-{% macro resources_section(resources) %}
+{# Category on the left, its links inline on the right. A table rather than a
+   grid, because WeasyPrint handles grid poorly and this has to survive a page
+   break. Categories with no items never reach the template (R3). #}
+{% macro resources_section(resources, lang) %}
   {% if resources %}
-    <div class="resources-grid">
-      {% for category, items in resources.items() %}
-        {% if items %}
-          <div class="resource-block">
-            <h3>{{ category|capitalize }}</h3>
-            <ul class="resource-list">
-              {% for item in items %}
-                <li>
-                  {% if item.href %}
-                    <a href="{{ item.href }}">{{ item.label }}</a>
-                  {% else %}
-                    {{ item.label }}
-                  {% endif %}
-                  {% if item.badge %}<span class="badge">{{ item.badge }}</span>{% endif %}
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
+    <table class="resource-table">
+      <tbody>
+        {% for category in resources %}
+          <tr>
+            <th>{{ category.labels.get(lang) or category.labels.get('en') }}</th>
+            <td>
+              {%- for item in category['items'] -%}
+                {%- if not loop.first %}<span class="resource-sep"> · </span>{% endif -%}
+                {%- set label = item.labels.get(lang) or item.labels.get('en') -%}
+                {%- if item.href -%}
+                  <a href="{{ item.href }}">{{ label }}</a>
+                {%- else -%}
+                  {{ label }}
+                {%- endif -%}
+                {%- if item.badge %}<span class="badge">{{ item.badge }}</span>{% endif -%}
+              {%- endfor -%}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   {% endif %}
 {% endmacro %}

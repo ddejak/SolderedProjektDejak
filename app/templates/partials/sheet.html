@@ -1,0 +1,40 @@
+{# Shared skeleton for both datasheet templates.
+
+   The <footer> is deliberately the first element in the body. It is pulled out
+   of flow by `position: running(...)`, and WeasyPrint only makes a running
+   element available on pages from the point it appears in document order — put
+   it last and the footer prints on the final page only. #}
+{% macro sheet_head(product, lang, generated_at) %}
+  <footer class="report-footer">
+    <p>{{ product.locales[lang].name }} · SKU {{ product.sku }} · Generated {{ generated_at }}</p>
+  </footer>
+
+  <header class="report-header">
+    <div>
+      <p class="eyebrow">Product datasheet</p>
+      <h1>{{ product.locales[lang].name }}</h1>
+      <p class="subtitle">SKU {{ product.sku }}</p>
+    </div>
+    {% if product.images %}
+    <div class="hero-image">
+      <img src="{{ product.images[0] }}" alt="{{ product.locales[lang].name }}">
+    </div>
+    {% endif %}
+  </header>
+{% endmacro %}
+
+{% macro box_contents(product, heading) %}
+  {% if product.box_contents %}
+  <section class="section">
+    <h2>{{ heading }}</h2>
+    <ul class="box-list">
+      {% for item in product.box_contents %}
+        <li>
+          {{ item.qty }} × {{ item.name }}
+          {%- if item.description %} <span class="box-desc">— {{ item.description }}</span>{% endif -%}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+{% endmacro %}

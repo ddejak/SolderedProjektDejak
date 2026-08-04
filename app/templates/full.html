@@ -1,26 +1,27 @@
+{% from "partials/spec_table.html" import spec_table %}
+{% from "partials/resources.html" import resources_section %}
+{% from "partials/sheet.html" import sheet_head, box_contents %}
 <!doctype html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
   <meta charset="utf-8">
   <title>{{ product.locales[lang].name }} — Datasheet</title>
 </head>
-<body>
+<body class="full">
   <section class="sheet">
-    <header class="report-header">
-      <div>
-        <p class="eyebrow">Product datasheet</p>
-        <h1>{{ product.locales[lang].name }}</h1>
-        <p class="subtitle">SKU {{ product.sku }}</p>
-      </div>
-      {% if product.images %}
-      <div class="hero-image">
-        <img src="{{ product.images[0] }}" alt="{{ product.locales[lang].name }}">
-      </div>
-      {% endif %}
-    </header>
+    {{ sheet_head(product, lang, generated_at) }}
 
-    {% if product.locales[lang].long_description_html %}
+    {% if product.locales[lang].short_description_html %}
     <section class="section intro">
+      <h2>What it is</h2>
+      <div class="html-block">{{ product.locales[lang].short_description_html | safe }}</div>
+    </section>
+    {% endif %}
+
+    {# R3: every section below is skipped outright when the product has no data
+       for it, rather than printing a heading over empty space. #}
+    {% if product.locales[lang].long_description_html %}
+    <section class="section">
       <h2>Overview</h2>
       <div class="html-block">{{ product.locales[lang].long_description_html | safe }}</div>
     </section>
@@ -37,7 +38,6 @@
     <section class="section">
       <h2>Specifications</h2>
       {% for group in product.locales[lang].spec_groups %}
-        {% from "partials/spec_table.html" import spec_table %}
         {{ spec_table(group) }}
       {% endfor %}
     </section>
@@ -50,26 +50,32 @@
     </section>
     {% endif %}
 
-    {% if product.box_contents %}
+    {{ box_contents(product, "What’s in the box") }}
+
+    {% if product.variants %}
     <section class="section">
-      <h2>What’s in the box</h2>
-      <ul class="box-list">
-        {% for item in product.box_contents %}
-          <li>{{ item.qty }} × {{ item.name }}</li>
+      <h2>Variants</h2>
+      <ul class="variant-list">
+        {% for variant in product.variants %}
+          <li>
+            {{ variant.names.get(lang) or variant.names.get('en') or variant.name or variant.sku }}
+            {% if variant.sku %}— SKU {{ variant.sku }}{% endif %}
+          </li>
         {% endfor %}
       </ul>
     </section>
     {% endif %}
 
-    <section class="section resources-full">
+    {% if product.resources %}
+    <section class="section">
       <h2>Resources</h2>
-      {% from "partials/resources.html" import resources_section %}
-      {{ resources_section(product.resources) }}
+      {{ resources_section(product.resources, lang) }}
     </section>
+    {% endif %}
 
-    <footer class="report-footer">
-      <p>{{ product.locales[lang].name }} · SKU {{ product.sku }} · Generated {{ generated_at }}</p>
-    </footer>
+    {% if product.last_updated %}
+    <p class="footer-note">Product data last updated {{ product.last_updated[:10] }}. Source: solde.red/{{ product.sku }}</p>
+    {% endif %}
   </section>
 </body>
 </html>

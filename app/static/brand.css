@@ -1,6 +1,20 @@
+/* Soldered brand styling for both the picker UI and the printed datasheets.
+ *
+ * Solder Purple carries the design and Solder Blue is the accent, roughly the
+ * 80/20 split the brand guide asks for.
+ *
+ * Two rules worth knowing before editing:
+ *   1. WeasyPrint renders with media type `print`, so the @media print block is
+ *      what the PDF actually sees. Screen-only sizing must be undone there.
+ *   2. CSS grid is unreliable in WeasyPrint. Print layout uses tables and normal
+ *      flow only; grid is confined to the on-screen picker.
+ */
+
 :root {
   color-scheme: light;
   --purple: #5b2379;
+  --purple-dark: #47205f;
+  --purple-tint: #f4eef8;
   --blue: #23b9d6;
   --ink: #1c1a1f;
   --muted: #5f5a66;
@@ -10,18 +24,17 @@
 }
 
 * { box-sizing: border-box; }
+
 body {
   margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Source Sans 3", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   background: var(--paper);
   color: var(--ink);
 }
 
-.page-shell {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 28px;
-}
+/* ------------------------------------------------------------------ picker UI */
+
+.page-shell { max-width: 860px; margin: 0 auto; padding: 28px; }
 
 .eyebrow {
   margin: 0 0 8px;
@@ -31,22 +44,11 @@ body {
   color: var(--purple);
 }
 
-.app-header {
-  padding: 24px 0 20px;
-  border-bottom: 1px solid var(--line);
-}
+.app-header { padding: 24px 0 20px; border-bottom: 1px solid var(--line); }
+.app-header h1 { margin: 0 0 12px; font-size: clamp(2rem, 2.5vw, 2.5rem); }
 
-.app-header h1 {
-  margin: 0 0 12px;
-  font-size: clamp(2rem, 2.5vw, 2.5rem);
-}
-
-.hero-copy,
-.note,
-.alert {
-  margin: 0;
-  color: var(--muted);
-}
+.hero-copy, .note, .alert { margin: 0; color: var(--muted); }
+.alert { color: #a8324a; }
 
 .panel {
   margin: 24px 0;
@@ -56,22 +58,15 @@ body {
   background: var(--bg);
 }
 
-.search-form label,
-.generate-form label {
+.search-form label, .generate-form label {
   display: block;
   margin-bottom: 8px;
-  color: var(--ink);
   font-weight: 600;
 }
 
-.search-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-}
+.search-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
 
-.search-form input,
-.generate-form select {
+.search-form input, .generate-form select {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--line);
@@ -79,7 +74,7 @@ body {
   font: inherit;
 }
 
-button {
+button, .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -89,20 +84,14 @@ button {
   background: var(--purple);
   color: white;
   font: inherit;
+  text-decoration: none;
   cursor: pointer;
 }
 
-button:hover {
-  background: #47205f;
-}
+button:hover, .button:hover { background: var(--purple-dark); }
+.button.secondary { background: white; color: var(--purple); border: 1px solid var(--purple); }
 
-.product-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 10px;
-}
+.product-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 
 .product-list a {
   display: block;
@@ -113,175 +102,149 @@ button:hover {
   color: var(--ink);
 }
 
-.product-list a:hover {
-  border-color: var(--purple);
-}
+.product-list a:hover { border-color: var(--purple); }
 
-.preview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px;
-}
+.preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+.meta-label { margin: 0 0 4px; font-size: 0.85rem; color: var(--muted); }
+.meta-value { margin: 0 0 12px; font-weight: 700; }
+.form-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.form-row > div { flex: 1 1 160px; }
 
-.meta-label {
-  margin: 0 0 4px;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.meta-value {
-  margin: 0 0 12px;
-  font-weight: 700;
-}
-
-.box-list,
-.resource-list {
-  margin: 0;
-  padding-left: 18px;
-}
-
-.resource-list li {
-  margin-bottom: 8px;
-}
-
-.badge {
-  display: inline-flex;
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--blue);
-  color: white;
-  font-size: 0.75rem;
-}
-
-html, body {
-  min-height: 100%;
-}
+/* --------------------------------------------------------------- the datasheet */
 
 @page {
   size: A4;
-  margin: 18mm;
+  margin: 16mm 15mm 18mm;
+
   @bottom-left {
+    /* The running element is only available on pages from the point it appears
+     * in document order, so the template puts <footer> first. */
     content: element(report-footer);
-    font-size: 9pt;
-    color: var(--muted);
+    font-size: 8pt;
+    color: #5f5a66;
+    vertical-align: top;
+    padding-top: 4mm;
   }
+
   @bottom-right {
     content: "Page " counter(page) " of " counter(pages);
-    font-size: 9pt;
-    color: var(--muted);
+    font-size: 8pt;
+    color: #5f5a66;
+    vertical-align: top;
+    padding-top: 4mm;
   }
 }
 
-footer.report-footer {
-  position: running(report-footer);
-}
+footer.report-footer { position: running(report-footer); }
+footer.report-footer p { margin: 0; }
 
-.sheet {
-  width: 210mm;
-  margin: 0 auto;
-  padding: 18mm;
-  background: var(--paper);
-}
+/* On screen the sheet mimics a sheet of paper. In print @page already provides
+ * the margin, so this sizing has to be undone or every page overflows. */
+.sheet { width: 210mm; margin: 0 auto; padding: 18mm; background: var(--paper); }
 
 .report-header {
   display: flex;
   justify-content: space-between;
-  gap: 18px;
   align-items: flex-start;
-  margin-bottom: 18px;
+  gap: 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--purple);
 }
 
-.report-header h1 {
+.report-header h1 { margin: 0 0 4px; font-size: 1.7rem; line-height: 1.15; }
+.subtitle { margin: 0; color: var(--muted); }
+.hero-image img { display: block; width: 150px; max-width: 100%; }
+
+.section { margin: 14px 0; }
+.section h2 {
   margin: 0 0 8px;
-  font-size: 1.7rem;
-}
-
-.subtitle {
-  margin: 0;
-  color: var(--muted);
-}
-
-.hero-image img {
-  display: block;
-  width: 184px;
-  max-width: 100%;
-  border-radius: 12px;
-}
-
-.section {
-  margin: 18px 0;
-}
-
-.section h2,
-.spec-group h3 {
-  margin: 0 0 10px;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--purple);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 3px;
 }
 
-.html-block {
-  line-height: 1.5;
-}
+.spec-group h3 { margin: 10px 0 4px; font-size: 0.9rem; color: var(--purple-dark); }
+.html-block { line-height: 1.45; }
+.html-block :first-child { margin-top: 0; }
+.html-block :last-child { margin-bottom: 0; }
 
-.spec-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0 0 14px;
-}
-
-.spec-table th,
-.spec-table td {
+.spec-table { width: 100%; border-collapse: collapse; margin: 0 0 6px; }
+.spec-table th, .spec-table td {
   text-align: left;
-  padding: 10px 12px;
+  padding: 4px 8px;
   border: 1px solid var(--line);
+  vertical-align: top;
+}
+.spec-table th { width: 45%; background: var(--purple-tint); font-weight: 600; }
+
+.box-list { margin: 0; padding-left: 16px; }
+.box-list .box-desc { color: var(--muted); }
+
+/* Resources as a label/value table rather than a grid: category on the left,
+ * its links inline on the right. Compact and it survives a page break. */
+.resource-table { width: 100%; border-collapse: collapse; }
+.resource-table th {
+  text-align: left;
+  width: 26%;
+  padding: 4px 8px 4px 0;
+  color: var(--purple-dark);
+  font-weight: 600;
+  vertical-align: top;
+}
+.resource-table td { padding: 4px 0; vertical-align: top; }
+.resource-table a { color: var(--ink); text-decoration: none; }
+.resource-sep { color: var(--line); }
+
+.badge {
+  display: inline;
+  margin-left: 3px;
+  color: var(--blue);
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
-.spec-table th {
-  width: 38%;
-  background: #f7f5f9;
-}
+.variant-list { margin: 0; padding-left: 16px; }
+.footer-note { margin-top: 10px; color: var(--muted); font-size: 0.8rem; }
 
-.report-footer {
-  margin-top: 24px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.resource-block {
-  margin-bottom: 14px;
-}
-
-.resources-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-}
+/* --------------------------------------------------------------------- print */
 
 @media print {
-  body {
-    margin: 0;
-    background: white;
-  }
-  .page-shell {
-    padding: 0;
-  }
-  .panel,
-  .app-header,
-  .product-list a,
-  .search-form,
-  .generate-form {
+  body { margin: 0; background: white; font-size: 9.5pt; line-height: 1.4; }
+
+  /* Undo the on-screen paper simulation; @page owns the margins now. */
+  .sheet { width: auto; margin: 0; padding: 0; }
+
+  .page-shell, .panel, .app-header, .search-form, .generate-form, .product-list {
     display: none !important;
   }
-  .sheet {
-    box-shadow: none;
-    margin: 0;
-  }
-  .report-header,
-  .section,
-  .report-footer {
-    page-break-inside: avoid;
-  }
+
+  .report-header h1 { font-size: 17pt; }
+  .section h2 { font-size: 10.5pt; }
+  .spec-group h3 { font-size: 9pt; }
+
+  a { color: var(--ink); text-decoration: none; }
+
+  /* R4: keep table headers with their rows, never strand a heading, never split
+   * a short block across pages. */
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .spec-group, .resource-table, .box-list { page-break-inside: avoid; }
+  .report-header { page-break-after: avoid; }
+  img { max-width: 100%; }
+}
+
+/* The one-pager has a single A4 page to work with (R4), so it runs tighter than
+ * the full datasheet: smaller type, less padding, no page breaks anywhere. */
+@media print {
+  .onepager { font-size: 8.5pt; line-height: 1.32; }
+  .onepager .report-header h1 { font-size: 15pt; }
+  .onepager .hero-image img { width: 118px; }
+  .onepager .section { margin: 8px 0; }
+  .onepager .section h2 { font-size: 9.5pt; margin-bottom: 5px; }
+  .onepager .spec-group h3 { margin: 6px 0 2px; font-size: 8.5pt; }
+  .onepager .spec-table th, .onepager .spec-table td { padding: 2px 6px; }
+  .onepager .spec-table { margin-bottom: 4px; }
 }

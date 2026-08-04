@@ -1,7 +1,7 @@
-{% macro spec_table(group) %}
+{% macro spec_table(group, show_heading=True) %}
   {% if group.fields %}
     <div class="spec-group">
-      <h3>{{ group.label }}</h3>
+      {% if show_heading %}<h3>{{ group.label }}</h3>{% endif %}
       <table class="spec-table">
         <tbody>
           {% for field in group.fields %}

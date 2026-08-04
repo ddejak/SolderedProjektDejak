@@ -1,40 +1,29 @@
+{% from "partials/spec_table.html" import spec_table %}
+{% from "partials/resources.html" import resources_section %}
+{% from "partials/sheet.html" import sheet_head, box_contents %}
 <!doctype html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
   <meta charset="utf-8">
-  <title>{{ product.locales[lang].name }} — One Pager</title>
+  <title>{{ product.locales[lang].name }} — One-pager</title>
 </head>
-<body>
+{# `onepager` switches on the tighter print rules; everything here has to fit a
+   single A4 page for every product family (R4). #}
+<body class="onepager">
   <section class="sheet">
-    <header class="report-header">
-      <div>
-        <p class="eyebrow">Product datasheet</p>
-        <h1>{{ product.locales[lang].name }}</h1>
-        <p class="subtitle">SKU {{ product.sku }}</p>
-      </div>
-      {% if product.images %}
-      <div class="hero-image">
-        <img src="{{ product.images[0] }}" alt="{{ product.locales[lang].name }}">
-      </div>
-      {% endif %}
-    </header>
+    {{ sheet_head(product, lang, generated_at) }}
 
     <section class="section intro">
       <h2>What it is</h2>
       <div class="html-block">{{ product.locales[lang].short_description_html | safe }}</div>
     </section>
 
-    {% set groups = [] %}
-    {% for group in product.locales[lang].spec_groups %}
-      {% if group.key in onepager_group_keys %}
-        {% set _ = groups.append(group) %}
-      {% endif %}
-    {% endfor %}
-    {% if groups %}
+    {# Ranked by app/sections.py, not source order, so the groups that matter for
+       this product family come first. #}
+    {% if onepager_groups %}
     <section class="section">
       <h2>Key specifications</h2>
-      {% for group in groups %}
-        {% from "partials/spec_table.html" import spec_table %}
+      {% for group in onepager_groups %}
         {{ spec_table(group) }}
       {% endfor %}
     </section>
@@ -47,26 +36,14 @@
     </section>
     {% endif %}
 
-    {% if product.box_contents %}
+    {{ box_contents(product, "What’s in the box") }}
+
+    {% if product.resources %}
     <section class="section">
-      <h2>What’s in the box</h2>
-      <ul class="box-list">
-        {% for item in product.box_contents %}
-          <li>{{ item.qty }} × {{ item.name }}</li>
-        {% endfor %}
-      </ul>
+      <h2>Resources</h2>
+      {{ resources_section(product.resources, lang) }}
     </section>
     {% endif %}
-
-    <section class="section resources-summary">
-      <h2>Resources</h2>
-      {% from "partials/resources.html" import resources_section %}
-      {{ resources_section(product.resources) }}
-    </section>
-
-    <footer class="report-footer">
-      <p>{{ product.locales[lang].name }} · SKU {{ product.sku }} · Generated {{ generated_at }}</p>
-    </footer>
   </section>
 </body>
 </html>

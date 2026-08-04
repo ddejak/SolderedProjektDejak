@@ -236,7 +236,7 @@ Edge cases run by hand against the routes, with the actual result:
 | Variant SKU `333229` (Inkplate with enclosure) | Valid one-pager, 1 page |
 | German one-pager, Croatian full sheet | Both valid, translated labels and resources |
 | WeasyPrint missing (Windows, no GTK) | App still starts; `/generate` explains why and links to the HTML preview |
-| Second fetch of the same SKU | Served from disk cache, no network call |
+| Second fetch of the same SKU | Cold 0.455 s / 1 request, warm 0.004 s / 0 requests (measured with `requests.get` counted) |
 
 Things I checked by eye on the rendered PDFs: tables not cut across page breaks, no
 heading stranded at the bottom of a page, images scaled inside the text column, footer

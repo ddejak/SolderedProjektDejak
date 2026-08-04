@@ -1,0 +1,25 @@
+{% macro resources_section(resources) %}
+  {% if resources %}
+    <div class="resources-grid">
+      {% for category, items in resources.items() %}
+        {% if items %}
+          <div class="resource-block">
+            <h3>{{ category|capitalize }}</h3>
+            <ul class="resource-list">
+              {% for item in items %}
+                <li>
+                  {% if item.href %}
+                    <a href="{{ item.href }}">{{ item.label }}</a>
+                  {% else %}
+                    {{ item.label }}
+                  {% endif %}
+                  {% if item.badge %}<span class="badge">{{ item.badge }}</span>{% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}

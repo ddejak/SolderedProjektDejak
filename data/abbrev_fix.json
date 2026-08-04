@@ -1,0 +1,12 @@
+{
+  "mcu": "MCU",
+  "sd": "SD",
+  "rtc": "RTC",
+  "ic": "IC",
+  "gpio": "GPIO",
+  "adc": "ADC",
+  "i2c": "I2C",
+  "spi": "SPI",
+  "pwm": "PWM",
+  "usb": "USB"
+}

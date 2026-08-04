@@ -1,0 +1,19 @@
+Soldered-Task-AI-Application-Engineer.html
+Soldered-Tone-of-Voice-Brief.html
+
+# Python environment
+venv/
+.venv/
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local cache and build outputs
+cache/
+*.log
+
+# OS artifacts
+.DS_Store
+Thumbs.db

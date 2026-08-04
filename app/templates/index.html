@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Datasheet Generator · Soldered</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='brand.css') }}">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Soldered Electronics</p>
+        <h1>Product datasheet generator</h1>
+        <p class="hero-copy">Choose a product, select a template, then download a printable A4 PDF datasheet.</p>
+      </div>
+    </header>
+
+    <section class="panel">
+      <form method="get" class="search-form">
+        <label for="q">Search by SKU or product name</label>
+        <div class="search-row">
+          <input id="q" name="q" value="{{ query }}" placeholder="333232 or Inkplate 6">
+          <button type="submit">Search</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Products</h2>
+      {% if product_error %}
+        <p class="alert">{{ product_error }}</p>
+      {% endif %}
+      {% if products %}
+        <ul class="product-list">
+          {% for item in products[:40] %}
+            <li>
+              <a href="?sku={{ item.sku }}&template={{ selected_template }}&lang={{ selected_lang }}">{{ item.sku }} — {{ item.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+        {% if products|length > 40 %}
+          <p class="note">Showing first 40 results. Narrow your search to refine.</p>
+        {% endif %}
+      {% else %}
+        <p>No products found.</p>
+      {% endif %}
+    </section>
+
+    {% if product %}
+    <section class="panel product-preview">
+      <h2>Selected product</h2>
+      <div class="preview-grid">
+        <div>
+          <p class="meta-label">SKU</p>
+          <p class="meta-value">{{ product.sku }}</p>
+          <p class="meta-label">Name</p>
+          <p class="meta-value">{{ product.locales[selected_lang].name }}</p>
+          <p class="meta-label">Template</p>
+          <p class="meta-value">{{ selected_template|capitalize }}</p>
+        </div>
+        <div>
+          <p class="meta-label">Language</p>
+          <p class="meta-value">{{ selected_lang }}</p>
+          <p class="meta-label">Specs on one-pager</p>
+          <p class="meta-value">{{ onepager_groups|join(', ') or 'auto' }}</p>
+        </div>
+      </div>
+
+      <form method="get" class="generate-form">
+        <input type="hidden" name="sku" value="{{ product.sku }}">
+        <label for="template">Choose template</label>
+        <select id="template" name="template">
+          {% for option in template_choices %}
+            <option value="{{ option }}" {% if option == selected_template %}selected{% endif %}>{{ option|capitalize }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="lang">Language</label>
+        <select id="lang" name="lang">
+          {% for option in language_choices %}
+            <option value="{{ option }}" {% if option == selected_lang %}selected{% endif %}>{{ option.upper() }}</option>
+          {% endfor %}
+        </select>
+
+        <button type="submit" formaction="{{ url_for('generate_pdf') }}">Download PDF</button>
+      </form>
+    </section>
+    {% endif %}
+  </main>
+</body>
+</html>

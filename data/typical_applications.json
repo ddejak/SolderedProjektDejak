@@ -1,0 +1,5 @@
+{
+  "333232": "Inkplate 6 is a compact e-paper display module for connected dashboards, price tags and environmental monitors. It suits projects where you want a low-power screen that stays readable without a backlight. Connect it to your ESP32 or Arduino board, then update the content over Wi-Fi for a display that can run for days on a single charge.",
+  "333352": "NULA DeepSleep ESP32-S3 is built for low-power wireless firmware development with the ESP32-S3, especially where periodic wakeups and sensor readouts matter. Use it in battery-backed data loggers, remote controls or interactive gadgets that need Wi-Fi and BLE, with the option to sleep deeply between network activity.",
+  "333032": "The SHTC3 Breakout gives you a compact temperature and humidity sensor with a qwiic-compatible I2C connector. It fits into environmental sensing, HVAC monitoring and smart home prototypes where accurate air measurements matter and you want to avoid soldering a sensor directly to the board."
+}

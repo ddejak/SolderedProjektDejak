@@ -1,0 +1,273 @@
+:root {
+  color-scheme: light;
+  --purple: #5b2379;
+  --blue: #23b9d6;
+  --ink: #1c1a1f;
+  --muted: #5f5a66;
+  --paper: #ffffff;
+  --line: #e2dee7;
+  --bg: #f7f5f9;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.page-shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+
+.app-header {
+  padding: 24px 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app-header h1 {
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 2.5vw, 2.5rem);
+}
+
+.hero-copy,
+.note,
+.alert {
+  margin: 0;
+  color: var(--muted);
+}
+
+.panel {
+  margin: 24px 0;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+}
+
+.search-form label,
+.generate-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.search-form input,
+.generate-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--purple);
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #47205f;
+}
+
+.product-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.product-list a {
+  display: block;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.product-list a:hover {
+  border-color: var(--purple);
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.meta-label {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.meta-value {
+  margin: 0 0 12px;
+  font-weight: 700;
+}
+
+.box-list,
+.resource-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.resource-list li {
+  margin-bottom: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--blue);
+  color: white;
+  font-size: 0.75rem;
+}
+
+html, body {
+  min-height: 100%;
+}
+
+@page {
+  size: A4;
+  margin: 18mm;
+}
+
+.sheet {
+  width: 210mm;
+  margin: 0 auto;
+  padding: 18mm;
+  background: var(--paper);
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.report-header h1 {
+  margin: 0 0 8px;
+  font-size: 1.7rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.hero-image img {
+  display: block;
+  width: 184px;
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+.section {
+  margin: 18px 0;
+}
+
+.section h2,
+.spec-group h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  color: var(--purple);
+}
+
+.html-block {
+  line-height: 1.5;
+}
+
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 14px;
+}
+
+.spec-table th,
+.spec-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+}
+
+.spec-table th {
+  width: 38%;
+  background: #f7f5f9;
+}
+
+.report-footer {
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.resource-block {
+  margin-bottom: 14px;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+@media print {
+  body {
+    margin: 0;
+    background: white;
+  }
+  .page-shell {
+    padding: 0;
+  }
+  .panel,
+  .app-header,
+  .product-list a,
+  .search-form,
+  .generate-form {
+    display: none !important;
+  }
+  .sheet {
+    box-shadow: none;
+    margin: 0;
+  }
+  .report-header,
+  .section,
+  .report-footer {
+    page-break-inside: avoid;
+  }
+}

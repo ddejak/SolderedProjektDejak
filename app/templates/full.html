@@ -6,14 +6,19 @@
 <head>
   <meta charset="utf-8">
   <title>{{ product.locales[lang].name }} — Datasheet</title>
+  {# @page margin boxes cannot be reached by an element selector, so the
+     localized page counter is injected per render. #}
+  <style>
+    @page { @bottom-right { content: "{{ t.page }} " counter(page) " {{ t.of }} " counter(pages); } }
+  </style>
 </head>
 <body class="full">
   <section class="sheet">
-    {{ sheet_head(product, lang, generated_at) }}
+    {{ sheet_head(product, lang, generated_at, t) }}
 
     {% if product.locales[lang].short_description_html %}
     <section class="section intro">
-      <h2>What it is</h2>
+      <h2>{{ t.what_it_is }}</h2>
       <div class="html-block">{{ product.locales[lang].short_description_html | safe }}</div>
     </section>
     {% endif %}
@@ -22,21 +27,21 @@
        for it, rather than printing a heading over empty space. #}
     {% if product.locales[lang].long_description_html %}
     <section class="section">
-      <h2>Overview</h2>
+      <h2>{{ t.overview }}</h2>
       <div class="html-block">{{ product.locales[lang].long_description_html | safe }}</div>
     </section>
     {% endif %}
 
     {% if product.locales[lang].technical_details_html %}
     <section class="section">
-      <h2>Technical details</h2>
+      <h2>{{ t.technical_details }}</h2>
       <div class="html-block">{{ product.locales[lang].technical_details_html | safe }}</div>
     </section>
     {% endif %}
 
     {% if product.locales[lang].spec_groups %}
     <section class="section">
-      <h2>Specifications</h2>
+      <h2>{{ t.specifications }}</h2>
       {% for group in product.locales[lang].spec_groups %}
         {{ spec_table(group) }}
       {% endfor %}
@@ -45,16 +50,16 @@
 
     {% if product.typical_applications.get(product.sku) %}
     <section class="section">
-      <h2>Typical applications</h2>
+      <h2>{{ t.typical_applications }}</h2>
       <p>{{ product.typical_applications[product.sku] }}</p>
     </section>
     {% endif %}
 
-    {{ box_contents(product, "What’s in the box") }}
+    {{ box_contents(product, t.box_contents) }}
 
     {% if product.variants %}
     <section class="section">
-      <h2>Variants</h2>
+      <h2>{{ t.variants }}</h2>
       <ul class="variant-list">
         {% for variant in product.variants %}
           <li>
@@ -68,13 +73,13 @@
 
     {% if product.resources %}
     <section class="section">
-      <h2>Resources</h2>
+      <h2>{{ t.resources }}</h2>
       {{ resources_section(product.resources, lang) }}
     </section>
     {% endif %}
 
     {% if product.last_updated %}
-    <p class="footer-note">Product data last updated {{ product.last_updated[:10] }}. Source: solde.red/{{ product.sku }}</p>
+    <p class="footer-note">{{ t.last_updated }} {{ product.last_updated[:10] }}. {{ t.source }}: solde.red/{{ product.sku }}</p>
     {% endif %}
   </section>
 </body>

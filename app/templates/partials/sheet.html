@@ -4,14 +4,14 @@
    of flow by `position: running(...)`, and WeasyPrint only makes a running
    element available on pages from the point it appears in document order — put
    it last and the footer prints on the final page only. #}
-{% macro sheet_head(product, lang, generated_at) %}
+{% macro sheet_head(product, lang, generated_at, t) %}
   <footer class="report-footer">
-    <p>{{ product.locales[lang].name }} · SKU {{ product.sku }} · Generated {{ generated_at }}</p>
+    <p>{{ product.locales[lang].name }} · SKU {{ product.sku }} · {{ t.generated }} {{ generated_at }}</p>
   </footer>
 
   <header class="report-header">
     <div>
-      <p class="eyebrow">Product datasheet</p>
+      <p class="eyebrow">{{ t.eyebrow }}</p>
       <h1>{{ product.locales[lang].name }}</h1>
       <p class="subtitle">SKU {{ product.sku }}</p>
     </div>

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -25,6 +26,11 @@ LANGUAGES = ["en", "de", "hr"]
 TEMPLATES = ["onepager", "full"]
 MAX_RESULTS = 40
 
+# Section headings are ours, not Soldered's, so they are not in the source data.
+# Without these a German datasheet would print German prose under English
+# headings, which is worse than not offering the language at all.
+UI_STRINGS = json.loads((DATA_DIR / "ui_strings.json").read_text(encoding="utf-8"))
+
 
 def _clean_params():
     """Read sku/template/lang off the query string, falling back to defaults."""
@@ -49,6 +55,7 @@ def _build_context(sku: str, template_name: str, language: str) -> dict:
         "selected_template": template_name,
         "onepager_groups": select_onepager_groups(spec_groups),
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "t": UI_STRINGS.get(language, UI_STRINGS["en"]),
     }
 
 

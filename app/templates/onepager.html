@@ -6,15 +6,20 @@
 <head>
   <meta charset="utf-8">
   <title>{{ product.locales[lang].name }} — One-pager</title>
+  {# @page margin boxes cannot be reached by an element selector, so the
+     localized page counter is injected per render. #}
+  <style>
+    @page { @bottom-right { content: "{{ t.page }} " counter(page) " {{ t.of }} " counter(pages); } }
+  </style>
 </head>
 {# `onepager` switches on the tighter print rules; everything here has to fit a
    single A4 page for every product family (R4). #}
 <body class="onepager">
   <section class="sheet">
-    {{ sheet_head(product, lang, generated_at) }}
+    {{ sheet_head(product, lang, generated_at, t) }}
 
     <section class="section intro">
-      <h2>What it is</h2>
+      <h2>{{ t.what_it_is }}</h2>
       <div class="html-block">{{ product.locales[lang].short_description_html | safe }}</div>
     </section>
 
@@ -22,7 +27,7 @@
        this product family come first. #}
     {% if onepager_groups %}
     <section class="section">
-      <h2>Key specifications</h2>
+      <h2>{{ t.key_specifications }}</h2>
       {% for group in onepager_groups %}
         {{ spec_table(group) }}
       {% endfor %}
@@ -31,16 +36,16 @@
 
     {% if product.typical_applications.get(product.sku) %}
     <section class="section">
-      <h2>Typical applications</h2>
+      <h2>{{ t.typical_applications }}</h2>
       <p>{{ product.typical_applications[product.sku] }}</p>
     </section>
     {% endif %}
 
-    {{ box_contents(product, "What’s in the box") }}
+    {{ box_contents(product, t.box_contents) }}
 
     {% if product.resources %}
     <section class="section">
-      <h2>Resources</h2>
+      <h2>{{ t.resources }}</h2>
       {{ resources_section(product.resources, lang) }}
     </section>
     {% endif %}

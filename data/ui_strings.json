@@ -1,0 +1,53 @@
+{
+  "en": {
+    "eyebrow": "Product datasheet",
+    "what_it_is": "What it is",
+    "overview": "Overview",
+    "technical_details": "Technical details",
+    "key_specifications": "Key specifications",
+    "specifications": "Specifications",
+    "typical_applications": "Typical applications",
+    "box_contents": "What’s in the box",
+    "variants": "Variants",
+    "resources": "Resources",
+    "generated": "Generated",
+    "last_updated": "Product data last updated",
+    "source": "Source",
+    "page": "Page",
+    "of": "of"
+  },
+  "de": {
+    "eyebrow": "Produktdatenblatt",
+    "what_it_is": "Kurzbeschreibung",
+    "overview": "Überblick",
+    "technical_details": "Technische Details",
+    "key_specifications": "Wichtigste technische Daten",
+    "specifications": "Technische Daten",
+    "typical_applications": "Typische Anwendungen",
+    "box_contents": "Lieferumfang",
+    "variants": "Varianten",
+    "resources": "Ressourcen",
+    "generated": "Erstellt",
+    "last_updated": "Produktdaten zuletzt aktualisiert",
+    "source": "Quelle",
+    "page": "Seite",
+    "of": "von"
+  },
+  "hr": {
+    "eyebrow": "Tehnički list proizvoda",
+    "what_it_is": "Kratki opis",
+    "overview": "Pregled",
+    "technical_details": "Tehnički detalji",
+    "key_specifications": "Ključne specifikacije",
+    "specifications": "Specifikacije",
+    "typical_applications": "Tipične primjene",
+    "box_contents": "Sadržaj pakiranja",
+    "variants": "Varijante",
+    "resources": "Resursi",
+    "generated": "Generirano",
+    "last_updated": "Podaci o proizvodu zadnji put ažurirani",
+    "source": "Izvor",
+    "page": "Stranica",
+    "of": "od"
+  }
+}

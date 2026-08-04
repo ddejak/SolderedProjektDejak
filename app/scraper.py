@@ -1,13 +1,16 @@
 import json
 import re
-from datetime import datetime, timedelta
+from collections import Counter
+from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
 SEARCH_INDEX_URL = "https://solde.red/search_index.json"
 SKU_URL_TEMPLATE = "https://solde.red/{sku}"
+LOCALES = ("en", "de", "hr")
 DEFAULT_TTL_SECONDS = 60 * 60 * 24
 USER_AGENT = "SolderedDatasheetBot/1.0 (+https://solde.red)"
 
@@ -129,37 +132,103 @@ class ProductPage:
     def _parse_box_contents(self, soup: BeautifulSoup) -> list:
         boxes = []
         for card in soup.select(".packing-card"):
-            text = " ".join(card.stripped_strings)
             qty = 1
-            qty_match = re.search(r"(\d+)\s*[x×]", text)
-            if qty_match:
-                qty = int(qty_match.group(1))
-                text = text.replace(qty_match.group(0), "", 1).strip()
-            name = text
-            boxes.append({"qty": qty, "name": name})
+            qty_node = card.select_one(".packing-qty")
+            if qty_node:
+                qty_match = re.search(r"(\d+)", qty_node.get_text())
+                if qty_match:
+                    qty = int(qty_match.group(1))
+
+            name_node = card.select_one(".packing-name")
+            if not name_node:
+                continue
+            # The SKU is nested inside .packing-name; pull it out before reading
+            # the name, otherwise it ends up glued on as "Inkplate 6 333232".
+            sku_node = name_node.select_one(".packing-sku")
+            sku = sku_node.get_text(strip=True) if sku_node else None
+            if sku_node:
+                sku_node.extract()
+
+            name = " ".join(name_node.stripped_strings)
+            desc_node = card.select_one(".packing-desc")
+            description = " ".join(desc_node.stripped_strings) if desc_node else None
+
+            boxes.append({"qty": qty, "name": name, "sku": sku, "description": description})
         return boxes
 
-    def _parse_resources(self, soup: BeautifulSoup) -> dict:
-        categories = {"technical": [], "documentation": [], "software": [], "compliance": []}
+    def _parse_resources(self, soup: BeautifulSoup) -> list:
+        # A .resource-card is a category container holding several .resource-item
+        # links, not a single resource. Iterating the card only would silently
+        # drop every resource after the first.
+        categories: dict[str, dict] = {}
         for card in soup.select(".resource-card"):
-            category = card.get("data-cat", "technical").strip().lower()
-            category = category if category in categories else "technical"
-            href = None
-            label = None
-            badge = None
-            link = card.find("a", href=True)
-            if link:
-                href = link.get("href")
-                label = link.get_text(strip=True)
-            if not label:
-                label = card.get("data-loc-en") or card.get("data-loc-de") or card.get("data-loc-hr") or card.get_text(strip=True)
-            badge_node = card.select_one(".badge")
-            if badge_node:
-                badge = badge_node.get_text(strip=True)
-            elif card.get("data-badge"):
-                badge = card["data-badge"].strip()
-            categories[category].append({"label": label, "href": href, "badge": badge})
-        return categories
+            category = (card.get("data-cat") or "other").strip().lower()
+            title = card.select_one(".resource-card-title")
+            if category not in categories:
+                fallback = title.get_text(strip=True) if title else category.capitalize()
+                categories[category] = {
+                    "key": category,
+                    "labels": {
+                        locale: ((title.get(f"data-cat-label-{locale}") if title else None) or fallback).strip()
+                        for locale in LOCALES
+                    },
+                    "items": [],
+                }
+            for item in card.select(".resource-item"):
+                label_node = item.select_one(".resource-item-label")
+                if label_node is None:
+                    continue
+                fallback = label_node.get_text(strip=True)
+                labels = {
+                    locale: (label_node.get(f"data-loc-{locale}") or fallback).strip()
+                    for locale in LOCALES
+                }
+                badge_node = item.select_one(".resource-item-badge")
+                categories[category]["items"].append(
+                    {
+                        "labels": labels,
+                        "href": item.get("href"),
+                        "badge": badge_node.get_text(strip=True) if badge_node else None,
+                    }
+                )
+
+        result = []
+        for category in categories.values():
+            items = self._dedupe_by_href(category["items"])
+            self._disambiguate_labels(items)
+            category["items"] = items
+            if items:
+                result.append(category)
+        return result
+
+    def _dedupe_by_href(self, items: list) -> list:
+        seen = set()
+        unique = []
+        for item in items:
+            key = item["href"] or item["labels"]["en"]
+            if key in seen:
+                continue
+            seen.add(key)
+            unique.append(item)
+        return unique
+
+    def _disambiguate_labels(self, items: list) -> None:
+        """Append the host when one label covers two different resources.
+
+        333232 lists "Arduino: Get Started" twice under software, once for
+        docs.soldered.com and once for inkplate.readthedocs.io. They are
+        genuinely different pages, so dropping one loses a resource, but two
+        identical link texts side by side read like a bug on a printed sheet.
+        """
+        counts = Counter(item["labels"]["en"] for item in items)
+        for item in items:
+            if counts[item["labels"]["en"]] < 2 or not item["href"]:
+                continue
+            host = urlparse(item["href"]).netloc.removeprefix("www.")
+            if not host:
+                continue
+            for locale in LOCALES:
+                item["labels"][locale] = f'{item["labels"][locale]} ({host})'
 
     def _parse_last_updated(self, soup: BeautifulSoup) -> str:
         node = soup.select_one(".last-updated")

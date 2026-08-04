@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: soldered-datasheet
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      # gunicorn binds $PORT; Render injects it.
+      - key: PYTHONUNBUFFERED
+        value: "1"

@@ -6,6 +6,7 @@ from pathlib import Path
 from flask import Flask, redirect, render_template, request, send_file, url_for
 
 from app.normalizer import Normalizer
+from app.pdf import WEASYPRINT_AVAILABLE, WEASYPRINT_ERROR, render_pdf
 from app.scraper import ProductPage, SearchIndex
 from app.sections import get_onepager_group_keys
 
@@ -81,7 +82,51 @@ def generate_pdf():
     raw = ProductPage(CACHE_DIR).fetch(sku)
     product = normalizer.normalize(raw)
     html_template = f"{template_name}.html"
-    rendered = render_template(
+    context = {
+        "product": product,
+        "lang": language,
+        "languages": LANGUAGES,
+        "selected_lang": language,
+        "selected_template": template_name,
+        "onepager_group_keys": get_onepager_group_keys(product["locales"][language].get("spec_groups", [])),
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+    }
+    css_path = ROOT / "app" / "static" / "brand.css"
+
+    if not WEASYPRINT_AVAILABLE:
+        return render_template(
+            "pdf_error.html",
+            message=str(WEASYPRINT_ERROR),
+            sku=sku,
+            template=template_name,
+            lang=language,
+        )
+
+    pdf_stream = render_pdf(html_template, context, TEMPLATE_DIR, css_path)
+    filename = f"{sku}-{template_name}.pdf"
+    return send_file(
+        pdf_stream,
+        as_attachment=True,
+        download_name=filename,
+        mimetype="application/pdf",
+    )
+
+
+@app.route("/preview")
+def preview():
+    sku = request.args.get("sku", "").strip()
+    template_name = request.args.get("template", "onepager")
+    language = request.args.get("lang", "en")
+    language = language if language in LANGUAGES else "en"
+    if not sku:
+        return redirect(url_for("index"))
+    if template_name not in TEMPLATES:
+        template_name = "onepager"
+
+    raw = ProductPage(CACHE_DIR).fetch(sku)
+    product = normalizer.normalize(raw)
+    html_template = f"{template_name}.html"
+    return render_template(
         html_template,
         product=product,
         lang=language,
@@ -90,18 +135,6 @@ def generate_pdf():
         selected_template=template_name,
         onepager_group_keys=get_onepager_group_keys(product["locales"][language].get("spec_groups", [])),
         generated_at=datetime.utcnow().isoformat() + "Z",
-    )
-
-    from weasyprint import HTML, CSS
-    css_path = ROOT / "static" / "brand.css"
-    pdf_bytes = HTML(string=rendered, base_url=str(ROOT)).write_pdf(stylesheets=[CSS(filename=str(css_path))])
-
-    filename = f"{sku}-{template_name}.pdf"
-    return send_file(
-        BytesIO(pdf_bytes),
-        as_attachment=True,
-        download_name=filename,
-        mimetype="application/pdf",
     )
 
 

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PDF generation unavailable</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='brand.css') }}">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="panel">
+      <h1>PDF generation unavailable</h1>
+      <p>WeasyPrint is not available in this environment.</p>
+      <p><strong>Error</strong>: {{ message }}</p>
+      <p>Use the preview link below to inspect the generated document in your browser, or run the app in Docker / WSL for PDF output.</p>
+      <p><a href="{{ url_for('preview') }}?sku={{ sku }}&template={{ template }}&lang={{ lang }}">Open HTML preview</a></p>
+      <p><a href="{{ url_for('index') }}">Back to product selection</a></p>
+    </section>
+  </main>
+</body>
+</html>
